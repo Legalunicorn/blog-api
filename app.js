@@ -3,16 +3,33 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require("mongoose")
+ 
 
+require("dotenv").config(); // environment variables
+
+//TODO create article routes
+//TODO create comments routes
+//TODO create likes routes
+//TODO create auth routes
+const articleRouter = require('./routes/articles')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
 
-//I have no need for a view engine, using ReactJS on the frontend
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
+
+// SET UP DB CONNECTION
+mongoose.set("strictQuery",false);
+const mongoDB = process.env.MONGO_URI;
+main().catch(err=>console.log(err));
+async function main(){
+  await mongoose.connect(mongoDB);
+}
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -20,6 +37,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//TODO set up passport then initialize it with the app below
+//
+
+//TODO enable cors, read up first
+
+
+
+/**
+ * ========== ROUTES ===============
+ */
+
+
+//TODO use all the imported routes:
+app.use('/articles',articleRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
@@ -40,3 +71,8 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+
+//using reactjs as frontned, no need for template enginge
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const PostSchema = new Schema({
+const ArticleSchema = new Schema({
     title:{
         type: String,
         maxLength:300,
@@ -26,9 +26,14 @@ const PostSchema = new Schema({
         default:0,
         min:0,
         
+    },
+    author:{
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required:true
     }
 },{
     timestamps:true //createdAt and updatedAt automatically
 })
 
-exports.default = mongoose.model("Post",PostSchema);
+module.exports= mongoose.model("Article",ArticleSchema);

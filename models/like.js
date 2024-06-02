@@ -9,7 +9,7 @@ const LikeSchema = new Schema({
     },
     post:{
         types: Schema.Types.ObjectId,
-        ref: "Post",
+        ref: "Article",
         required:true,
     }
 })

@@ -19,9 +19,14 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    is_writer:{
+        type: Boolean,
+        default:false
+    },
     provider_id:{
         type: String,
-        unique: true
+        unique: true,
+        
     },
     hashed_password:{
         type: String
