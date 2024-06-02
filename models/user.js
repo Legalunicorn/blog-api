@@ -2,12 +2,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
+const randomName = require("../utils/randomName")
+
 
 const UserSchema = new Schema({
     display_name:{
         type:String,
         maxLength: 50,
-        default:"User"
+        default: randomName() //user can change later on
     },
     email:{
         type:String,
@@ -16,10 +18,6 @@ const UserSchema = new Schema({
     is_admin:{
         type: Boolean,
         default: false
-    },
-    provider:{
-        type: String,
-        default: "email"
     },
     provider_id:{
         type: String,
@@ -33,7 +31,7 @@ const UserSchema = new Schema({
 module.exports = mongoose.model("User",UserSchema);
 
 module.exports.encryptPassword = function(password){
-    const salt = bcrypt.genSaltSync(10);
+    const salt = bcrypt.genSaltSync(10); //random salt
     const hash = bcrypt.hashSync(password,salt,null);
     return hash
 }
