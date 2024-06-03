@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require("mongoose")
+
+// import the passport config
+const passportSetup = require("./config/passport-setup")
  
 
 require("dotenv").config(); // environment variables
@@ -12,6 +15,7 @@ require("dotenv").config(); // environment variables
 //TODO create comments routes
 //TODO create likes routes
 //TODO create auth routes
+const authRouter = require("./routes/auth")
 const articleRouter = require('./routes/articles')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -50,6 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 //TODO use all the imported routes:
+app.use('/auth',authRouter);
 app.use('/articles',articleRouter);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

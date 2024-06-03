@@ -38,6 +38,7 @@ exports.all_articles_get = asyncHandler(async (req,res)=>{
 //tags ->convert to array
 //image url
 //TODO add authentication that only the moderator with author id OR an admin can do this
+//
 exports.artcles_post = [
 
     //make the tags an array first
@@ -83,6 +84,7 @@ exports.artcles_post = [
                 tags:tags,
                 // image: req.body.image.replaceAll("&#x2F;","/").replaceAll("&amp;","&"),
                 //no need to unescape.. html can load your escaped elements as a src, please note
+                // author:
                 image:req.body.image,
                 likes_count:0
             })
@@ -171,6 +173,7 @@ exports.article_patch = [
         
         
     asyncHandler( async(req,res)=>{
+        res.json({mssg:"hi"})
         //get all tags from DB first
         const errors = validationResult(req);
         if (!errors.isEmpty()){
@@ -180,21 +183,20 @@ exports.article_patch = [
 
         //check if id 
 
-        const tags = await processFormTags(req.body.tag);
+        const tags = await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,
+        //ACTUALLY, no, because your front end will make a GET to /articles/:id, and you wouldnt reach here if the article doesnt exist in the first place?!
         try{
             const article = new Article({
                 title: req.body.title,
                 body: req.body.body,
                 tags:tags,
-                // image: req.body.image.replaceAll("&#x2F;","/").replaceAll("&amp;","&"),
-                //no need to unescape.. html can load your escaped elements as a src, please note
                 image:req.body.image,
                 likes_count:0,
-                id_:
+                id_: req.params.id
             })
 
-            await article.save();
-            res.json(article)
+            // await article.save();
+            // res.json(article)
         } catch(err){
             console.log("an error while making new document")
             res.status(400).json({error:err.message}) //status 400 for bad request
