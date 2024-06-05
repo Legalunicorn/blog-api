@@ -11,16 +11,11 @@ const processFormTags = require("../utils/processFormTags")
 
 
 exports.all_articles_get = asyncHandler(async (req,res)=>{
-    // i want all the articles
-    // but what about featured articles? 
-    // recent article? 
 
-    //--- recent posts (all posts) as well
-    //--- top posts
-    //--- all posts 
     const top_articles = await Article.find({}).sort({likes_count:1}).exec();
     const all_articles = await Article.find({}).sort({createdAt:-1}).exec();
     const recent_articles = all_articles.slice(0,5); //show top 5 articles
+    // recent_articles is like not really needed but whatever
 
 
     res.json(
@@ -40,9 +35,6 @@ exports.all_articles_get = asyncHandler(async (req,res)=>{
 //TODO add authentication that only the moderator with author id OR an admin can do this
 //
 exports.artcles_post = [
-
-    //make the tags an array first
-    //custom middleware
     (req,res,next)=>{
         if (!Array.isArray(req.body.tag)){
             req.body.tag = typeof req.body.tag==="undefined"? []:[req.body.tag];
@@ -98,6 +90,9 @@ exports.artcles_post = [
     })
 ]
 
+//TODO write a function that returns only articles written by a user
+//TODO write another function that returns all articles to the CMS? -> require admin auth 
+
 exports.article_get = asyncHandler(async(req,res)=>{
     //check if the if is a valid mongoDB id
 
@@ -130,13 +125,10 @@ exports.article_delete = asyncHandler(async(req,res)=>{
         if (article===null){
             res.status(404).json({error:"Article not found"})
         }
-        console.log("huh")
         res.json(article) //send back article information, to update react context 
     } catch(error){
         res.status(400).json({error:error.message})
     }
-
-    // res.json({mssg: `testing delete ${req.params.id}`})
 })
 
 //TODO add authentication that only the moderator with author id OR an admin can do this

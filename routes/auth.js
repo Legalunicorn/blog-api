@@ -11,8 +11,8 @@ router.get("/google",authController.google_get)
 
 router.get("/google/redirect",authController.google_redirect_get)
 
-//TODO create login and signup functions
-// router.post("login",authController.login_post)
-// router.post("signup",authController.signup_post)
+// //TODO create login and signup functions
+// router.post("/email/signup",authController.email_signup_post)
+// router.post("/email/login",authController.email_login_get)
 
 module.exports = router

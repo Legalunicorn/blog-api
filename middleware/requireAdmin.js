@@ -3,14 +3,8 @@ const User = require("../models/user")
 
 
 
-// req.headers.authroization is from the frontend, which extracts t
+const requireAdmin = async (req,res,next)=>{
 
-const requireAuth = async (req,res,next)=>{
-    /**
-     * Whatever route that needs auth, should have the user object in the 
-     * req.headers.authorization
-     * we take that and use jwt . reverify 
-     */
     const auth = req.headers.authorization //'Bearer dpfdsofijafsap"
     if (!auth){
         return res.status(401).json({error:'Authorization token required'})
@@ -21,6 +15,9 @@ const requireAuth = async (req,res,next)=>{
     try{
         const {_id} = jwt.verify(token,process.env.SECRET)
         req.user = await User.findById({_id}).select("_id") //throw the user in the request object
+        if (!user.is_admin){
+            res.status(401).json({error:"Request only authorized for admins"})
+        }
         next() //acees granded, move on to the next middleware
 
     } catch(error){
@@ -30,5 +27,3 @@ const requireAuth = async (req,res,next)=>{
 
 
 }
-
-module.exports = requireAuth

@@ -30,8 +30,50 @@ const UserSchema = new Schema({
     },
     hashed_password:{
         type: String
+    },
+    token:{ //for the jwt ? .. 
+        type:String,
+        default: ""
     }
 })
+
+UserSchema.static.emailSignup = async (email,password,display_name)=>{
+    const exist = await this.findOne({email}).exec();
+    if (exist){
+        throw Error('Email already in use')
+    } else{
+        const user = new this.create({
+            display_name,
+            email,
+            hashed_password: encryptPassword(password)
+        })
+        
+        await user.save();
+        return user;
+
+    }
+}
+
+UserSchema.static.emailLogin = async(email,password)=>{
+    //check both fields
+    if (!email || !password){
+        throw Error("All fields must be field")
+    }
+
+    const user = await this.findOne({email}).exec();
+    if (!user){
+        throw Error("Incorrect email")
+    }
+
+    isValid = validPassword(password,user.hashed_password)
+    if (!isValid){
+        throw Error("Password is Incorrect.")
+    }
+
+    //good to go
+    return user;
+}
+
 
 module.exports = mongoose.model("User",UserSchema);
 
