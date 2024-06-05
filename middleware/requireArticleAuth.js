@@ -56,3 +56,5 @@ const requireArticleAuth = async(req,res,next) =>{
         res.status(401).json({error:"Request for article auth not authorized"})
     }
 }
+
+module.exports = requireArticleAuth

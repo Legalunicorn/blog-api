@@ -1,8 +1,10 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema;
 
+//comment has no author
+
 const CommentSchema = new Schema({
-    user:{
+    author:{
         type: Schema.Types.ObjectId,
         ref: "User",
         required:true,
@@ -15,10 +17,10 @@ const CommentSchema = new Schema({
     body:{
         type: String,
         required:true,
-        maxLength: 2
+        maxLength: 3000
     }
 })
 
 
-modules.export = mongoose.model("Comment",CommentSchema)
+module.exports = mongoose.model("Comment",CommentSchema)
 //add to the collection "Comment" if u didnt know 

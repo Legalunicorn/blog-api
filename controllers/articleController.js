@@ -9,14 +9,13 @@ const Tag = require("../models/tag")
 const is_valid_mongoID = require("../utils/validMongoId")
 const processFormTags = require("../utils/processFormTags")
 
+//custom middleware
+
 
 exports.all_articles_get = asyncHandler(async (req,res)=>{
-
     const top_articles = await Article.find({}).sort({likes_count:1}).exec();
     const all_articles = await Article.find({}).sort({createdAt:-1}).exec();
     const recent_articles = all_articles.slice(0,5); //show top 5 articles
-    // recent_articles is like not really needed but whatever
-
 
     res.json(
         {all_articles,
@@ -24,7 +23,6 @@ exports.all_articles_get = asyncHandler(async (req,res)=>{
         recent_articles}
     )
 })
-
 
 //takes in alot from the body 
 

@@ -15,10 +15,10 @@ require("dotenv").config(); // environment variables
 //TODO create comments routes
 //TODO create likes routes
 //TODO create auth routes
-const authRouter = require("./routes/auth")
-const articleRouter = require('./routes/articles')
+const authRouter = require("./routes/authRoutes")
+const articleRouter = require('./routes/articleRoutes')
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var usersRouter = require('./routes/userRoutes');
 
 var app = express();
 

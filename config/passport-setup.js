@@ -8,11 +8,8 @@ require("dotenv").config(); //google client id and secret
 
 
 
-//rememeber to passport.use() this in the app.jszzxx
-//TODO config local strategy
 
 
-//TODO config google oauth strategy
 passport.use(
     new GoogleStrategy({
         callbackURL: '/auth/google/redirect',
@@ -21,12 +18,6 @@ passport.use(
 
     }, async(accessToken,refreshToken,profile,done)=>{
 
-        // console.log(profile);
-        // console.log(profile.id);
-        // console.log(profile.emails[0].value);
-        // return done();
-        //rofile.displayname
-
         const existingGoogleUser = await User.findOne({provider_id:profile.id}).exec();
 
         //User has used google login with this gmail before
@@ -34,7 +25,7 @@ passport.use(
         
             const jwt = genToken(existingGoogleUser.id);
             existingGoogleUser.token = jwt;
-            await existingGoogleUser.save();
+            // await existingGoogleUser.save();
             return done(null,existingGoogleUser)
 
         }
@@ -42,15 +33,12 @@ passport.use(
         //Search for existing email account because we can merge
         const existingEmail = await User.findOne({email:profile.emails[0].vale}).exec();
         if (existingEmail!==null){
-            //we register this email account to have a google id 
-            //we also generate a toke n
             const jwt = genToken(existingEmail.id);
             existingEmail.token = jwt;
             existingEmail.provider_id = profile.id; //the google id
             await existingEmail.save();
             return done(null,existingEmail)
         }
-
 
         // User is completely new
         try{
@@ -59,11 +47,18 @@ passport.use(
                 email: profile.emails[0].value,
                 provider_id: profile.id
             })
+
+            //JWT PORTION
+            // newUser is attached to `req.user`
+            // what we are doing is saving the jwt to the newUser
+            // the sending 
     
             await newUser.save();
             const jwt = genToken(newUser.id);
             newUser.token = jwt;
-            await newUser.save();
+            console.log("testing no save:")
+            console.log(newUser)
+            // await newUser.save(); //i dont need to do this?
             return done(null,newUser)            
         } catch(err){
             console.log(err.message)

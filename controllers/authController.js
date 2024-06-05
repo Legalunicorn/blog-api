@@ -23,16 +23,16 @@ exports.google_redirect_get = [
         session: false
     }),
     (req,res)=>{
-        console.log("here u fuck")
-        console.log(req.user)
-        console.log(req.user.token)
+        // console.log("here u fuck")
+        // console.log(req.user)
+        // console.log(req.user.token)
         res.redirect("/auth/google")
         // res.json()
         //test this, the req.user 
         //the user should have the json web token
-        // const jwt = req.user.token;
-        // req.token = jwt;
-        // // res.json({res.token})
+        const jwt = req.user.token;
+        req.token = jwt;
+        res.json()
         // console.log("TOKEN",req.token)
         // res.status(200).redirect('/'); //goes to the index page.
         
