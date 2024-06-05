@@ -31,10 +31,11 @@ const UserSchema = new Schema({
     hashed_password:{
         type: String
     },
-    token:{ //for the jwt ? .. 
-        type:String,
-        default: ""
-    }
+    //dont think i neeed this?..
+    // token:{ //for the jwt ? .. 
+    //     type:String,
+    //     default: ""
+    // }
 })
 
 UserSchema.static.emailSignup = async (email,password,display_name)=>{

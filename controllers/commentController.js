@@ -45,11 +45,45 @@ exports.comment_post = [
 
 
 
+//TODO comment_patch, essentially the same as post 
+//handle the authentication in the routes already
+exports.comment_patch = [
+    param("article_id")
+        .trim()
+        .isMongoId()
+        .escape(),
+    param("comment_id")
+        .trim()
+        .isMongoId()
+        .escape(),        
+    body("body")
+        .trim()
+        .isLength({max:3000})
+        .notEmpty()
+        .escape(),
 
-exports.comment_patch = async (req,res)=>{
+    async (req,res)=>{
+        const errors = validationResult(req);
+        if (!errors.isEmpty()){
+            res.status(400).json({error:errors.array()});
+        }
+
+        try{
+            //get the comment
+            const comment = await Comment.findById(req.params.comment_id).exec();
+            comment.body = req.body.body;
+            await comment.save();
+            res.status(200).json({comment})
+            
+        } catch(err){
+            console.log("Error while updating comment. ")
+            console.log(err.message);
+            res.status(400).json({error:err.message})
+        }
     //
 
-}
+    }
+]
 
 exports.comment_delete = async(req,res)=>{
 

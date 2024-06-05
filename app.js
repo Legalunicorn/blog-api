@@ -60,20 +60,45 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
+//In Express, 404 responses are not the result of an error, 
+//so the error-handler middleware will not capture them
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+//the use a custom error handler
+// app.use(function(err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
+
+app.use(function(err,req,res,next){
+  //log the error
+  console.log(`Errors: ${err.message}`);
+  console.error(err.stack)
+  res.header('Content-Type','application/json')
+  const status = err.status || 400; //bad request
+  //TODO lookup cast error
+  if (err.name==="CastError"){
+    res.status(status).json({
+      error: `Invalid  ${err.path} : ${err.value}`,sucess:false //TODO look up success false
+    })
+  }
+  //not cast error
+  res.status(status).json({error:err.message || 'Something went wrong',sucess:false});
+})
+
+//TODO figure out how this works
+//apparently 404 is handled separately
+app.use(function(req,res,next){
+  res.status(404).json({error:"Invalid Path"})
+})
 
 module.exports = app;
 

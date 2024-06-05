@@ -11,7 +11,7 @@ const processFormTags = require("../utils/processFormTags")
 
 //custom middleware
 
-
+//CMS
 exports.all_articles_get = asyncHandler(async (req,res)=>{
     const top_articles = await Article.find({}).sort({likes_count:1}).exec();
     const all_articles = await Article.find({}).sort({createdAt:-1}).exec();
@@ -24,14 +24,7 @@ exports.all_articles_get = asyncHandler(async (req,res)=>{
     )
 })
 
-//takes in alot from the body 
-
-//title
-//body
-//tags ->convert to array
-//image url
-//TODO add authentication that only the moderator with author id OR an admin can do this
-//
+//CMS
 exports.artcles_post = [
     (req,res,next)=>{
         if (!Array.isArray(req.body.tag)){
@@ -67,29 +60,26 @@ exports.artcles_post = [
             return;
         }
         const tags = await processFormTags(req.body.tag);
-        try{
-            const article = new Article({
-                title: req.body.title,
-                body: req.body.body,
-                tags:tags,
-                // image: req.body.image.replaceAll("&#x2F;","/").replaceAll("&amp;","&"),
-                //no need to unescape.. html can load your escaped elements as a src, please note
-                // author:
-                image:req.body.image,
-                likes_count:0
-            })
+        const article = new Article({
+            title: req.body.title,
+            body: req.body.body,
+            tags:tags,
+            image:req.body.image,
+            likes_count:0
+        })
 
-            await article.save();
-            res.json(article)
-        } catch(err){
-            console.log("an error while making new document")
-            res.status(400).json({error:err.message}) //status 400 for bad request
-        }
+        await article.save();
+        res.json(article)
     })
 ]
 
 //TODO write a function that returns only articles written by a user
-//TODO write another function that returns all articles to the CMS? -> require admin auth 
+//CMS, low priorty
+// actually it should be articles retrievable by user
+// exports.get_articles_authorized_by_user
+
+
+
 
 exports.article_get = asyncHandler(async(req,res)=>{
     //check if the if is a valid mongoDB id
@@ -101,7 +91,7 @@ exports.article_get = asyncHandler(async(req,res)=>{
     }
     // load the article content
     const article = await Article.findById(req.params.id).exec();
-
+    //if null an error wont be thrown, thus we handle the error like this
     if (article===null){
         res.status(404).json({error: "No such article"})
     }
@@ -117,16 +107,15 @@ exports.article_delete = asyncHandler(async(req,res)=>{
     if (!is_valid_mongoID(req.params.id)){
         res.status(404).json({error:"Article not found"})
     }
-
-    try{
+    // try{
         const article = await Article.findByIdAndDelete(req.params.id).exec();
         if (article===null){
             res.status(404).json({error:"Article not found"})
         }
         res.json(article) //send back article information, to update react context 
-    } catch(error){
-        res.status(400).json({error:error.message})
-    }
+    // } catch(error){
+    //     res.status(400).json({error:error.message})
+    // }
 })
 
 //TODO add authentication that only the moderator with author id OR an admin can do this
@@ -138,7 +127,7 @@ exports.article_patch = [
         if (!Array.isArray(req.body.tag)){
             req.body.tag = typeof req.body.tag==="undefined"? []:[req.body.tag];
         }
-        next();
+        next(); //next is line 1333
     },
 
     body("title")
@@ -175,7 +164,7 @@ exports.article_patch = [
 
         const tags = await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,
         //ACTUALLY, no, because your front end will make a GET to /articles/:id, and you wouldnt reach here if the article doesnt exist in the first place?!
-        try{
+        // try{
             const article = new Article({
                 title: req.body.title,
                 body: req.body.body,
@@ -185,11 +174,11 @@ exports.article_patch = [
                 id_: req.params.id
             })
 
-            // await article.save();
-            // res.json(article)
-        } catch(err){
-            console.log("an error while making new document")
-            res.status(400).json({error:err.message}) //status 400 for bad request
-        }
+            await article.save();
+            res.json({article})
+        // } catch(err){
+        //     console.log("an error while making new document")
+        //     res.status(400).json({error:err.message}) //status 400 for bad request
+        // }
     })
 ]

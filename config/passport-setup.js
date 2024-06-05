@@ -23,8 +23,8 @@ passport.use(
         //User has used google login with this gmail before
         if (existingGoogleUser!==null){
         
-            const jwt = genToken(existingGoogleUser.id);
-            existingGoogleUser.token = jwt;
+            // const jwt = genToken(existingGoogleUser.id);
+            // existingGoogleUser.token = jwt;
             // await existingGoogleUser.save();
             return done(null,existingGoogleUser)
 
@@ -33,8 +33,15 @@ passport.use(
         //Search for existing email account because we can merge
         const existingEmail = await User.findOne({email:profile.emails[0].vale}).exec();
         if (existingEmail!==null){
-            const jwt = genToken(existingEmail.id);
-            existingEmail.token = jwt;
+
+            // const jwt = genToken(existingEmail.id);
+
+            /**
+             * Actually we can generate the jwt on the authcontroller side
+             */
+
+            // existingEmail.token = jwt;
+
             existingEmail.provider_id = profile.id; //the google id
             await existingEmail.save();
             return done(null,existingEmail)
@@ -54,8 +61,10 @@ passport.use(
             // the sending 
     
             await newUser.save();
-            const jwt = genToken(newUser.id);
-            newUser.token = jwt;
+
+            // const jwt = genToken(newUser.id);
+            // newUser.token = jwt;
+
             console.log("testing no save:")
             console.log(newUser)
             // await newUser.save(); //i dont need to do this?
