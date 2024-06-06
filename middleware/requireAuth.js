@@ -19,7 +19,13 @@ const requireAuth = async (req,res,next)=>{
     const token = auth.split(' ')[1];
 
     try{
-        const {id} = jwt.verify(token,process.env.SECRET)
+        const {id} = jwt.verify(token,process.env.SECRET, function(err,decoded){
+            if (err){
+                res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
+            }
+        })
+
+        //jwt.
         req.user = await User.findById(id).select("_id") //throw the user in the request object
         next() //acees granded, move on to the next middleware
 

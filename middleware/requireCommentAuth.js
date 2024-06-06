@@ -11,7 +11,12 @@ const requireCommentAuth = async(req,res,next) =>{
     }
     const token = auth.split(" ")[1];
     try{
-        const {_id} = jwt.verify(token,process.env.SECRET)
+        const {id} = jwt.verify(token,process.env.SECRET, function(err,decoded){
+            if (err){
+                res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
+            }
+        })        
+        // const {_id} = jwt.verify(token,process.env.SECRET)
         const user = User.findById(_id).exec();
 
         // first if the user is admin, dont need to check if they wrote the article
