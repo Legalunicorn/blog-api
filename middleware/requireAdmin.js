@@ -13,17 +13,19 @@ const requireAdmin = async (req,res,next)=>{
     const token = auth.split(' ')[1];
 
     try{
-        const {_id} = jwt.verify(token,process.env.SECRET)
-        req.user = await User.findById({_id}).select("_id") //throw the user in the request object
+        const {id} = jwt.verify(token,process.env.SECRET) //just the id
+        const user = await User.findOne({_id:id},['_id','is_admin']).exec();//throw the user in the request object
         if (!user.is_admin){
             res.status(401).json({error:"Request only authorized for admins"})
         }
+        req.user = user._id;
         next() //acees granded, move on to the next middleware
 
     } catch(error){
         console.log(error);
-        res.status(401).json({error:"Request not authorized"})
+         res.status(401).json({error:"Request not authorized"})
     }
 
-
 }
+
+module.exports = requireAdmin

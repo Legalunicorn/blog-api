@@ -25,6 +25,8 @@ exports.all_articles_get = asyncHandler(async (req,res)=>{
 })
 
 //CMS
+//require is writer or is admin
+//admins are writer by default
 exports.artcles_post = [
     (req,res,next)=>{
         if (!Array.isArray(req.body.tag)){
@@ -57,27 +59,53 @@ exports.artcles_post = [
         const errors = validationResult(req);
         if (!errors.isEmpty()){
             res.status(400).json({error:errors.array()})
-            return;
-        }
-        const tags = await processFormTags(req.body.tag);
-        const article = new Article({
-            title: req.body.title,
-            body: req.body.body,
-            tags:tags,
-            image:req.body.image,
-            likes_count:0
-        })
+        } else {
+            const tags = await processFormTags(req.body.tag);
+            const article = new Article({
+                title: req.body.title,
+                body: req.body.body,
+                tags:tags,
+                image:req.body.image,
+                likes_count:0,
+                author: req.user
+            })
 
-        await article.save();
-        res.json(article)
+            await article.save();
+            console.log("THE NEW ARTICLE IS");
+            console.log(article);
+            res.status(200).json({article})
+        }
     })
 ]
 
-//TODO write a function that returns only articles written by a user
 //CMS, low priorty
 // actually it should be articles retrievable by user
 // exports.get_articles_authorized_by_user
 
+//auth scop
+exports.article_written_by_users= asyncHandler(async(req,res)=>{
+    //req.user in the auth will sufficer
+    if (!is_valid_mongoID(req.user._id)) {
+        return res.status(400).json({error:"Invalid User ID;"})
+    }
+
+    const articles = await Article.find({id:req.user._id}).sort({createAt:-1}).exec();
+    res.status(200).json({
+        articles
+    });
+})
+
+
+exports.articles_require_admin_get = asyncHandler(async(req,res)=>{
+    if (!is_valid_mongoID(req.user._id)){
+        res.status(400).json({error:"Invalid User ID."})
+    }
+
+    const all_articles = await Article.find({}).sort({createAt:-1}).exec();
+    res.status(200).json({
+        articles
+    })
+})
 
 
 
@@ -99,18 +127,15 @@ exports.article_get = asyncHandler(async(req,res)=>{
         res.json(article);
     }
 })
-//TODO add authentication that only the moderator with author id OR an admin can do this
 exports.article_delete = asyncHandler(async(req,res)=>{
-    //TODO delete article
-
     //first make sure the id is valid
     if (!is_valid_mongoID(req.params.id)){
-        res.status(404).json({error:"Article not found"})
+        return res.status(404).json({error:"Article not found"})
     }
     // try{
         const article = await Article.findByIdAndDelete(req.params.id).exec();
         if (article===null){
-            res.status(404).json({error:"Article not found"})
+            return res.status(404).json({error:"Article not found"})
         }
         res.json(article) //send back article information, to update react context 
     // } catch(error){
@@ -118,7 +143,6 @@ exports.article_delete = asyncHandler(async(req,res)=>{
     // }
 })
 
-//TODO add authentication that only the moderator with author id OR an admin can do this
 exports.article_patch = [
 
     //make the tags an array first
@@ -159,12 +183,7 @@ exports.article_patch = [
             res.status(400).json({error:errors.array()})
             return;
         }
-
-        //check if id 
-
         const tags = await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,
-        //ACTUALLY, no, because your front end will make a GET to /articles/:id, and you wouldnt reach here if the article doesnt exist in the first place?!
-        // try{
             const article = new Article({
                 title: req.body.title,
                 body: req.body.body,
@@ -176,9 +195,6 @@ exports.article_patch = [
 
             await article.save();
             res.json({article})
-        // } catch(err){
-        //     console.log("an error while making new document")
-        //     res.status(400).json({error:err.message}) //status 400 for bad request
-        // }
+
     })
 ]

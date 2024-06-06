@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler")
 const jwt = require("jsonwebtoken");
 
 function generateToken(id){
-    return jwt.sign({id},process.env.SECRET,{expiresIn:'10m'})
+    return jwt.sign({id},process.env.SECRET,{expiresIn:'1d'})
 }
 
 

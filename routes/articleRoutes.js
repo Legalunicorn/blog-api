@@ -9,6 +9,7 @@ const comment_controller = require("../controllers/commentController")
 //custom middleware
 const requireAuth = require("../middleware/requireAuth")
 const requireArticleAuth = require("../middleware/requireArticleAuth")
+const requireWriter = require("../middleware/requireWriter")
 
 
 //base route will be "/articles"
@@ -19,7 +20,7 @@ router.get("/:article_id",article_controller.article_get)
 
 //CMS
 router.post("/",
-    requireAuth,
+    requireWriter,
     article_controller.artcles_post
 ) //needs to be a user
 
@@ -37,10 +38,10 @@ router.patch("/:article_id",
 )
 
 //new comment under aticle
-router.post("/:id/comments",
+router.post("/:article_id/comments",
     requireAuth,
     comment_controller.comment_post
 )
 
 
-module.exports = router
+module.exports = router;

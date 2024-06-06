@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Scehma = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const LikeSchema = new Schema({
     user:{
@@ -8,7 +8,7 @@ const LikeSchema = new Schema({
         required:true
     },
     post:{
-        types: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Article",
         required:true,
     }
