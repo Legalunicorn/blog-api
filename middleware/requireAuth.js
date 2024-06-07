@@ -19,10 +19,13 @@ const requireAuth = async (req,res,next)=>{
     const token = auth.split(' ')[1];
 
     try{
-        const {id} = jwt.verify(token,process.env.SECRET, function(err,decoded){
+        // const {id} = jwt.verify(token,process.env.SECRET) //just the id
+        let id;
+        jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
                 res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
             }
+            id = decoded.id;
         })
 
         //jwt.

@@ -1,0 +1,36 @@
+Main objectives
+//TODO Test API with post man 
+
+
+====== COMPLETED ======
+POST article 
+    create articlle
+
+GET /article/id 
+    get a certain article
+
+POST /article/id/ 
+    comment under article done
+
+DELET /article/id
+    - non admin non writer cannot delete (done)
+    - writer can delete (done)
+    - non writer, admin can delete (done)
+
+POST /auth/google  
+    login sign up with google
+
+POST /like/article/id
+    like a post and unlike
+
+
+NOT done
+- patch comment
+
+
+- delete comment
+- patch comment 
+(there is no view comment)
+
+- sign up with emaill
+- login with email 

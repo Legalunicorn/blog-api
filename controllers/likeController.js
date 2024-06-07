@@ -18,9 +18,9 @@ exports.like_put = asyncHandler(async(req,res,next)=>{
     const hasLiked = await Like.findOneAndDelete({
         user: req.user._id,
         post: req.params.article_id
-    }).exec();
+    }).exec(); //returns
 
-    if (hasLiked!==null){
+    if (hasLiked===null){
         await Like.create({
             user:req.user._id,
             post:req.params.article_id
@@ -29,6 +29,8 @@ exports.like_put = asyncHandler(async(req,res,next)=>{
         await article.save();
     }
     else{
+        console.log("Has liked is")
+        console.log(hasLiked);
         article.likes_count-=1;
         await article.save();
     }

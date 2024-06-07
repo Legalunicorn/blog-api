@@ -10,7 +10,7 @@ const requireAuth = require("../middleware/requireAuth")
 
 //actually this should be an update route 
 // update the like count -> 
-router.post("/article/:article_id/",
+router.post("/articles/:article_id/",
     requireAuth,
     likeController.like_put)
 

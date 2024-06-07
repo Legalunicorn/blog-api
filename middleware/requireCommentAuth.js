@@ -7,26 +7,29 @@ const { model } = require("mongoose");
 const requireCommentAuth = async(req,res,next) =>{
     const auth = req.headers.authorization;
     if (!auth){
-        res.status(401).json({error:"Request not authroized"})
+        res.status(401).json({error:"Request not authorized"})
     }
     const token = auth.split(" ")[1];
     try{
-        const {id} = jwt.verify(token,process.env.SECRET, function(err,decoded){
+        let id;
+        jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
                 res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
             }
-        })        
+            id = decoded.id;
+        })       
         // const {_id} = jwt.verify(token,process.env.SECRET)
-        const user = User.findById(_id).exec();
-
+        const user = User.findById(id).exec();
         // first if the user is admin, dont need to check if they wrote the article
         if (user.is_admin){
+            console.log("comment auth granted to admin")
             req.user = user;
             next();
         }
 
-        const comment = Comment.findById(req.params.comment_id).exec();
-        if (comment.author===_id){
+        const comment = Comment.findById(req.params.comment_id).populate("author").exec();
+        if (comment.author._id.toString()===_id){
+            console.log("comment auth granted to writer")
             req.user = user;
             next();
         }

@@ -27,28 +27,30 @@ const requireArticleAuth = async(req,res,next) =>{
     try{
         //the params will have the article id ?
         //
-        const {id} = jwt.verify(token,process.env.SECRET, function(err,decoded){
+        let id;
+        jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
-                res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
+                return res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
             }
+            id = decoded.id;
         })
-        const user = User.findById(_id).exec();
-
-        // first if the user is admin, dont need to check if they wrote the article
-
+    
+        const user = await User.findById(id).exec();
         if (user.is_admin){
-            req.user = user;
+            req.user = user; //set the id to req.user
             next();
+            return;
         }
 
         //not admin 
-        const article = Article.findById(req.params.article_id).exec();
-        if (article.author===_id){
+        const article = await Article.findById(req.params.article_id).lean().populate("author","_id").exec();
+        if (article.author._id.toString()===id){
             //not admin, but is the author
-            req.user = user;
+            req.user = user; //auth pass the users 
             next();
+            return
         }
-        req.status(401).json({error:"Article auth failed."})
+        else res.status(401).json({error:"Article auth failed."})
 
         //a
         //get the author of the aricle

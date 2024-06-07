@@ -13,8 +13,8 @@ const processFormTags = require("../utils/processFormTags")
 
 //CMS
 exports.all_articles_get = asyncHandler(async (req,res)=>{
-    const top_articles = await Article.find({}).sort({likes_count:1}).exec();
-    const all_articles = await Article.find({}).sort({createdAt:-1}).exec();
+    const top_articles = await Article.find({}).sort({likes_count:1}).populate("author").exec();
+    const all_articles = await Article.find({}).sort({createdAt:-1}).populate("author").exec();
     const recent_articles = all_articles.slice(0,5); //show top 5 articles
 
     res.json(
@@ -129,15 +129,15 @@ exports.article_get = asyncHandler(async(req,res)=>{
 })
 exports.article_delete = asyncHandler(async(req,res)=>{
     //first make sure the id is valid
-    if (!is_valid_mongoID(req.params.id)){
+    if (!is_valid_mongoID(req.params.article_id)){
         return res.status(404).json({error:"Article not found"})
     }
     // try{
-        const article = await Article.findByIdAndDelete(req.params.id).exec();
+        const article = await Article.findByIdAndDelete(req.params.article_id).exec();
         if (article===null){
             return res.status(404).json({error:"Article not found"})
         }
-        res.json(article) //send back article information, to update react context 
+        res.status(200).json(article) //send back article information, to update react context 
     // } catch(error){
     //     res.status(400).json({error:error.message})
     // }
