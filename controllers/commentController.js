@@ -67,7 +67,7 @@ exports.comment_patch = [
     })
 ]
 
-exports.comment_delete = async(req,res)=>{
+exports.comment_delete = [
     param("comment_id")
         .trim()
         .isMongoId()
@@ -78,6 +78,8 @@ exports.comment_delete = async(req,res)=>{
         if (!errors.isEmpty()){
             res.status(400).json({error:errors.array()});
         }
-        await Comment.findByIdAndDelete(req.params.comment_id).exec();
+        console.log("hey?")
+        const comment = await Comment.findByIdAndDelete(req.params.comment_id).exec();
+        res.status(200).json({comment});
     })
-}
+]

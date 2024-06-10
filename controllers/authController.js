@@ -64,7 +64,7 @@ exports.google_redirect_get = [
 //Signup will automatically redirect the user to index
 //handle the redirect on the front end with <Link>
 exports.email_signup_post = async(req,res)=>{
-
+    //TODO add server side validation to req.boy
     const {email,password,display_name} = req.body;
     //for our signup, we automatically log in the user as well
     try{

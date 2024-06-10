@@ -14,7 +14,8 @@ require("dotenv").config(); // environment variables
 const authRouter = require("./routes/authRoutes")
 const articleRouter = require('./routes/articleRoutes')
 const likeRouter = require("./routes/likeRoutes")
-var indexRouter = require('./routes/index');
+const commentRouter = require("./routes/commentRoutes")
+// var indexRouter = require('./routes/index');
 
 var app = express();
 
@@ -48,10 +49,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 //TODO use all the imported routes:
-app.use('/auth',authRouter);
-app.use('/articles',articleRouter);
-app.use('/like',likeRouter)
-app.use('/', indexRouter);
+app.use('/api//auth',authRouter);
+app.use('/api//articles',articleRouter);
+app.use('/api/like',likeRouter)
+// app.use('/api', indexRouter);
+app.use("/api/comments",commentRouter)
 
 // catch 404 and forward to error handler
 //In Express, 404 responses are not the result of an error, 

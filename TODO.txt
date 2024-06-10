@@ -3,19 +3,33 @@ Main objectives
 
 
 ====== COMPLETED ======
+
 POST article 
     create articlle
 
-GET /article/id 
+GET /article/id  
     get a certain article
 
-POST /article/id/ 
-    comment under article done
-
-DELET /article/id
+DELETE /article/id 
+    (delete an article)
     - non admin non writer cannot delete (done)
     - writer can delete (done)
     - non writer, admin can delete (done)
+
+
+POST /article/id/  (create a comment)
+    comment under article done
+
+PATCH /comments/id/ 
+    (edit a comment)
+    - is author yes
+    - is admin, not writer: yes 
+    - not the author, not the admin: no
+
+DELET /comment/idl/
+    (delete a comment)
+    - pass different auth levels 
+
 
 POST /auth/google  
     login sign up with google
@@ -25,12 +39,6 @@ POST /like/article/id
 
 
 NOT done
-- patch comment
-
-
-- delete comment
-- patch comment 
-(there is no view comment)
 
 - sign up with emaill
 - login with email 

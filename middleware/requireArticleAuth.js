@@ -44,6 +44,10 @@ const requireArticleAuth = async(req,res,next) =>{
 
         //not admin 
         const article = await Article.findById(req.params.article_id).lean().populate("author","_id").exec();
+        if (article===null){
+            res.status(404).json({error:"article not found"})
+            return;
+        }
         if (article.author._id.toString()===id){
             //not admin, but is the author
             req.user = user; //auth pass the users 
