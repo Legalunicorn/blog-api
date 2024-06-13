@@ -42,3 +42,6 @@ NOT done
 
 - sign up with emaill
 - login with email 
+
+
+//BUG when deleting a article, delete all the comments in the db well.

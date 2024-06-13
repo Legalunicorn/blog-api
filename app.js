@@ -4,17 +4,20 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require("mongoose")
+const cors = require("cors")
 
 // import the passport config
 const passportSetup = require("./config/passport-setup")
  
 
-require("dotenv").config(); // environment variables
+// require("dotenv").config(); // environment variables
+require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
 
 const authRouter = require("./routes/authRoutes")
 const articleRouter = require('./routes/articleRoutes')
 const likeRouter = require("./routes/likeRoutes")
 const commentRouter = require("./routes/commentRoutes")
+
 // var indexRouter = require('./routes/index');
 
 var app = express();
@@ -31,7 +34,7 @@ async function main(){
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-
+app.use(cors())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -49,8 +52,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 //TODO use all the imported routes:
-app.use('/api//auth',authRouter);
-app.use('/api//articles',articleRouter);
+app.use('/api/auth',authRouter);
+app.use('/api/articles',articleRouter);
 app.use('/api/like',likeRouter)
 // app.use('/api', indexRouter);
 app.use("/api/comments",commentRouter)

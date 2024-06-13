@@ -19,6 +19,8 @@ const CommentSchema = new Schema({
         required:true,
         maxLength: 3000
     }
+},{
+    timestamps:true
 })
 
 

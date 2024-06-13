@@ -21,12 +21,17 @@ const requireAuth = async (req,res,next)=>{
     try{
         // const {id} = jwt.verify(token,process.env.SECRET) //just the id
         let id;
+        let hasJWTError = false;
         jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
+                hasJWTError = true;
+                console.log(token);
                 res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
+                return;
             }
             id = decoded.id;
         })
+        if (hasJWTError) return;
 
         //jwt.
         req.user = await User.findById(id).select("_id") //throw the user in the request object

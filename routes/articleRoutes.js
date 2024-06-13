@@ -16,8 +16,9 @@ const requireWriter = require("../middleware/requireWriter")
 
 //Viewer / CMS
 router.get("/",article_controller.all_articles_get)
-router.get("/:article_id",article_controller.article_get)
 
+router.get("/:article_id",article_controller.article_get)
+              
 //CMS
 router.post("/",
     requireWriter,

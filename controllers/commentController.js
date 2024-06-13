@@ -33,8 +33,10 @@ exports.comment_post = [
             article:req.params.article_id,
             body:req.body.body
         })
+        //FIX send back author and displayname
 
         await comment.save();
+        await comment.populate("author","display_name");
         res.status(200).json({comment});
 
     })

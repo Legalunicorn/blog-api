@@ -2,7 +2,6 @@ const router = require("express").Router();
 const authController = require("../controllers/authController")
 // const passport = require("passport")
 // const GoogleStrategy = require("passport-google-oauth20")
-// require("dotenv").config(); //google client id and secret
 
 
 // //NOTE: the base url is "/auth"

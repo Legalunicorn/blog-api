@@ -1,6 +1,8 @@
 const passport = require("passport")
+//TODO use asynchandler for email controllers 
 const asyncHandler = require("express-async-handler")
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 function generateToken(id){
     return jwt.sign({id},process.env.SECRET,{expiresIn:'1d'})
@@ -11,8 +13,6 @@ exports.google_get = [
     passport.authenticate('google',{
     scope:['profile','email']
     })
-    ,
-    (req,res)=>{res.json({mssg:"google_get"})}
 ]
 
 
@@ -35,12 +35,12 @@ exports.google_get = [
 
 exports.google_redirect_get = [
     passport.authenticate('google',{
-        failureRedirect:"/login",
+        // failureRedirect:"/login", //doesnt make sense to redirect inside an api 
         session: false
     }),
     (req,res)=>{
  
-        // res.redirect("/auth/google") //for testing only, in the react all we will redirect to the home page when needed
+        // res.redirect("/auth/google") //for testing only, in the react app we will redirect to the home page when needed
         // res.json()
         //test this, the req.user 
         //the user should have the json web token
@@ -49,10 +49,21 @@ exports.google_redirect_get = [
         console.log("===== AFTER GOOGLE REDIRECT ====")
         console.log(req.user)
         console.log(token)
-        res.status(200).json({
-            email: req.user.email,
-            token
-        })
+        //i cant really do this, i need to redirect
+        // res.status(200).json({
+        //     email: req.user.email,
+        //     token
+        // })
+
+        //redirect to VIEWER or CMS dependong on req(?)
+        //TODO change the redirect depending on which frontend client is logging in 
+        //for now we just redirect to the viewer,
+
+        // res.json({token})
+        // console.log("hey noob"+process.env.VIEWER_CLIENT_URL)
+        // console.log(process.env)
+        // res.redirect('http://localhost:5173/?token='+token)
+        res.redirect(`${process.env.VIEWER_CLIENT_URL}/?token=${token}`)
     }
 
 ]

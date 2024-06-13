@@ -5,6 +5,7 @@ const asyncHandler = require("express-async-handler");
 
 const Article =  require("../models/article")
 const Tag = require("../models/tag")
+const Comment = require("../models/comment")
 
 const is_valid_mongoID = require("../utils/validMongoId")
 const processFormTags = require("../utils/processFormTags")
@@ -14,7 +15,7 @@ const processFormTags = require("../utils/processFormTags")
 //CMS
 exports.all_articles_get = asyncHandler(async (req,res)=>{
     const top_articles = await Article.find({}).sort({likes_count:1}).populate("author").exec();
-    const all_articles = await Article.find({}).sort({createdAt:-1}).populate("author").exec();
+    const all_articles = await Article.find({}).sort({createdAt:-1}).populate("author").populate('tags','name').exec();
     const recent_articles = all_articles.slice(0,5); //show top 5 articles
 
     res.json(
@@ -111,20 +112,28 @@ exports.articles_require_admin_get = asyncHandler(async(req,res)=>{
 
 exports.article_get = asyncHandler(async(req,res)=>{
     //check if the if is a valid mongoDB id
+    console.log(req.params.article_id)
 
     //alternative, can use express-validator
     // pararams().isMongoId, which is discovered after creating this util function
-    if (!is_valid_mongoID(req.params.id)){ //actuall you can do this with express-validator
-        return res.status(404).json({error:"No such article"})
+    if (!is_valid_mongoID(req.params.article_id)){ //actuall you can do this with express-validator
+        return res.status(404).json({error:"No such article (id)"})
     }
     // load the article content
-    const article = await Article.findById(req.params.id).exec();
+    const article = await Article.findById(req.params.article_id).populate("author","display_name").exec();
+    //TODO return all comments by articles also 
+    const comments = await Comment
+        .find({article:req.params.article_id})
+        .populate("author","display_name")
+        .sort({createdAt:-1})
+        .exec();
+
     //if null an error wont be thrown, thus we handle the error like this
     if (article===null){
         res.status(404).json({error: "No such article"})
     }
     else{
-        res.json(article);
+        res.json({article,comments});
     }
 })
 exports.article_delete = asyncHandler(async(req,res)=>{
@@ -190,7 +199,7 @@ exports.article_patch = [
                 tags:tags,
                 image:req.body.image,
                 likes_count:0,
-                id_: req.params.id
+                id_: req.params.article_id
             })
 
             await article.save();

@@ -14,7 +14,7 @@ const ArticleSchema = new Schema({
     },
     tags:{
         type:[Schema.Types.ObjectId],
-        ref: "Tags"
+        ref: "Tag"
     },
     image:{
         //url to image
