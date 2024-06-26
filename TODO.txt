@@ -1,5 +1,4 @@
 Main objectives
-//TODO Test API with post man 
 
 
 ====== COMPLETED ======
@@ -44,4 +43,4 @@ NOT done
 - login with email 
 
 
-//BUG when deleting a article, delete all the comments in the db well.
+//TODO when deleting a article, delete all the comments in the db well.

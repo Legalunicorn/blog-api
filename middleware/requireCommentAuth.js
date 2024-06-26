@@ -6,11 +6,11 @@ const { model } = require("mongoose");
 //copied from article auth but changed to comment
 
 const requireCommentAuth = async(req,res,next) =>{
-    console.log("THE REQ HEADERS ARE"+req.headers)
     const auth = req.headers.authorization;
     if (!auth){
         res.status(401).json({error:"Request not authorized"})
     }
+    console.log("TEST AUHT",auth);
     const token = auth.split(" ")[1];
     try{
         let id;

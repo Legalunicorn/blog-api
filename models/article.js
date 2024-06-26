@@ -27,6 +27,10 @@ const ArticleSchema = new Schema({
         min:0,
         
     },
+    is_drafted:{
+        type: Boolean,
+        default: true
+    },
     author:{
         type: Schema.Types.ObjectId,
         ref: "User",

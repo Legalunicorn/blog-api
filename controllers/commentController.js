@@ -13,8 +13,9 @@ exports.comment_post = [
     body("body")
         .trim()
         .isLength({max:3000})
-        .notEmpty()
-        .escape(),
+        .notEmpty(),
+        //BUG ive decided not to escapse comments, lets see how it turns out
+        // .escape(),
 
     asyncHandler(async (req,res)=>{
         const errors = validationResult(req);
@@ -25,8 +26,10 @@ exports.comment_post = [
             console.log("tf");
             return res.status(400).json({error:errors.array()})
         }
-        console.log("inside post comment")
-        console.log("the user is..",req.user)
+        console.log("NEW COMMENT ALERT!!");
+        console.log(req.body.body);
+        // console.log("inside post comment")
+        // console.log("the user is..",req.user)
         //user should be in req.user because of the aut handler
         const comment = new Comment({
             author:req.user,  //
@@ -36,7 +39,7 @@ exports.comment_post = [
         //FIX send back author and displayname
 
         await comment.save();
-        await comment.populate("author","display_name");
+        await comment.populate("author");
         res.status(200).json({comment});
 
     })
@@ -65,6 +68,7 @@ exports.comment_patch = [
         const comment = await Comment.findById(req.params.comment_id).exec();
         comment.body = req.body.body; //update the content
         await comment.save();
+        await comment.populate("author");
         res.status(200).json({comment})
     })
 ]
@@ -80,7 +84,7 @@ exports.comment_delete = [
         if (!errors.isEmpty()){
             res.status(400).json({error:errors.array()});
         }
-        console.log("hey?")
+        // console.log("hey?")
         const comment = await Comment.findByIdAndDelete(req.params.comment_id).exec();
         res.status(200).json({comment});
     })

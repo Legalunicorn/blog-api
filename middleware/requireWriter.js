@@ -14,12 +14,17 @@ const requireWriter = async (req,res,next)=>{
 
     try{
         let id;
+        let hasJWTError = false;
         jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
+                hasJWTError = true;
+                console.log("EXPIRED! ")
+                console.log(err);
                 res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
             }
-            id = decoded.id;
+            else id=decoded.id;
         })        
+        if (hasJWTError) return;
         // const {id} = jwt.verify(token,process.env.SECRET) //just the id
         console.log("token is"+token)
         console.log("id from jwt is "+id)
@@ -32,7 +37,7 @@ const requireWriter = async (req,res,next)=>{
             console.log("tf")
             console.log(req.user.is_writer)
             console.log(req.user)
-            res.status(401).json({error:"Request only authorized for writers"})
+            res.status(401).json({error:"Only writers are allowed to post!"})
         }
         
         else next() //acees granded, move on to the next middleware

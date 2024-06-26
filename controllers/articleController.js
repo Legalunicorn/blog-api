@@ -13,21 +13,67 @@ const processFormTags = require("../utils/processFormTags")
 //custom middleware
 
 //CMS
+
 exports.all_articles_get = asyncHandler(async (req,res)=>{
-    const top_articles = await Article.find({}).sort({likes_count:1}).populate("author").exec();
-    const all_articles = await Article.find({}).sort({createdAt:-1}).populate("author").populate('tags','name').exec();
-    const recent_articles = all_articles.slice(0,5); //show top 5 articles
+
+    const top_articles = await Article.find({is_drafted:false}).sort({likes_count:-1}).populate("author").populate('tags','name').exec();
+    const all_articles = await Article.find({is_drafted:false}).sort({createdAt:-1}).populate("author").populate('tags','name').exec();
+
+    // const recent_articles = all_articles.slice(0,5); //show top 5 articles
+
+    //TODO get all tags
+    const tags = await Tag.find({}).sort({name:1}).exec()
+
 
     res.json(
         {all_articles,
         top_articles,
-        recent_articles}
+        tags
+    }
     )
+})
+
+
+exports.articles_by_tag_get = asyncHandler(async(req,res)=>{
+    const tag = req.params.tag_id;
+    console.log("the tag looking for is ",tag);
+    const sort = req.query.sort;
+    console.log(req.query.sort,"URM what the sigma")
+
+    let articles;
+    if (sort=='recent'){
+        console.log("sort by recent")
+         articles = await Article
+            .find({tags:tag,is_drafted:false})
+            .sort({createdAt:-1})
+            .populate("author")
+            .populate("tags","name")
+            .exec();
+    } else{
+        console.log("sort by TOp")
+         articles = await Article
+            .find({tags:tag,is_drafted:false})
+            .sort({likes_count:-1})
+            .populate("author")
+            .populate("tags","name")
+            .exec();        
+    }
+    console.log('articles are',articles)
+
+    res.json({articles});
 })
 
 //CMS
 //require is writer or is admin
 //admins are writer by default
+
+
+//TODO standarise the way you sanitise and hanlde data
+/**
+ * Comments -> Escaped and then output in react 
+ */
+
+//BUG REMOVE ANY UNNCESSARY ESCAPING. 
 exports.artcles_post = [
     (req,res,next)=>{
         if (!Array.isArray(req.body.tag)){
@@ -39,20 +85,26 @@ exports.artcles_post = [
     body("title")
         .trim()
         .isLength({max:300})
-        .withMessage("Title must not exceed 300 characters")
-        .escape(),
+        .withMessage("Title must not exceed 300 characters"),
+        // .escape(), //TODO 
     body("body")
         .trim()
         .isLength({max:50000})
-        .withMessage("Article should be less than 50,000 characters")
-        .escape(),
+        .withMessage("Article should be less than 50,000 characters"),
+        // .escape(),
     body("tag.*","Tags cannot exceed 100 characters long")
         .trim()
         .isLength({max:100})
         .escape(),
     body("image")
-        .trim()
-        .escape(),
+    //BUG this is dead ass chatgpt code. please review carefully 
+        .isURL().withMessage("Invalid URL"),
+        // .custom((value)=>{
+        //     if (!/\.(jpeg|jpg|png)$/.test(value)){
+        //         throw new Error("Url must be an image")
+        //     }
+        //     return true;
+        // }),
         
         
     asyncHandler( async(req,res)=>{
@@ -68,7 +120,8 @@ exports.artcles_post = [
                 tags:tags,
                 image:req.body.image,
                 likes_count:0,
-                author: req.user
+                author: req.user,
+                is_drafted: req.body.is_drafted
             })
 
             await article.save();
@@ -104,7 +157,7 @@ exports.articles_require_admin_get = asyncHandler(async(req,res)=>{
 
     const all_articles = await Article.find({}).sort({createAt:-1}).exec();
     res.status(200).json({
-        articles
+        all_articles
     })
 })
 
@@ -120,11 +173,14 @@ exports.article_get = asyncHandler(async(req,res)=>{
         return res.status(404).json({error:"No such article (id)"})
     }
     // load the article content
-    const article = await Article.findById(req.params.article_id).populate("author","display_name").exec();
-    //TODO return all comments by articles also 
+    const article = await Article
+        .findById(req.params.article_id)
+        .populate("author","display_name")
+        .populate("tags","name")
+        .exec();
     const comments = await Comment
         .find({article:req.params.article_id})
-        .populate("author","display_name")
+        .populate("author")
         .sort({createdAt:-1})
         .exec();
 

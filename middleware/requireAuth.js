@@ -13,6 +13,7 @@ const requireAuth = async (req,res,next)=>{
      */
     const auth = req.headers.authorization //'Bearer dpfdsofijafsap"
     if (!auth){
+        console.log("BRO")
         return res.status(401).json({error:'Authorization token required'})
     }
 
@@ -26,6 +27,9 @@ const requireAuth = async (req,res,next)=>{
             if (err){
                 hasJWTError = true;
                 console.log(token);
+                console.log(err);
+                //TODO return an error and reset the AuthContext and local Storage? 
+                //TODO find a way to use refresh tokens 
                 res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
                 return;
             }
@@ -38,6 +42,7 @@ const requireAuth = async (req,res,next)=>{
         next() //acees granded, move on to the next middleware
 
     } catch(error){
+        console.log("dude wtf")
         console.log(error);
         res.status(401).json({error:"Request not authorized"})
     }
