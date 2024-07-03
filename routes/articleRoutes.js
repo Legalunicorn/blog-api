@@ -23,6 +23,15 @@ router.get("/:article_id",article_controller.article_get)
 
 //TODO test this, new route 
 router.get("/tags/:tag_id/",article_controller.articles_by_tag_get)
+
+router.get("/users/posts",
+    requireAuth,
+    article_controller.articles_written_by_user)
+    
+router.get('/protected/:article_id',
+    requireArticleAuth,
+    article_controller.article_get //users the same end point as above
+)
               
 //CMS
 router.post("/",

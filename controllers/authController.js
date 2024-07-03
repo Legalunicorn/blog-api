@@ -74,9 +74,9 @@ exports.google_redirect_get = [
         if (host=="CMS"){
             console.log('bro');
             console.log(process.env.CMS_CLIENT_URL)
-            res.redirect(process.env.CMS_CLIENT_URL);
+            // res.redirect(process.env.CMS_CLIENT_URL);
             // res.redirect('https://yahoo.com')
-            // res.redirect(`${process.env.CMS_CLIENT_URL}/?token=${token}&id=${req.user._id}`)
+            res.redirect(`${process.env.CMS_CLIENT_URL}/login/?token=${token}&id=${req.user._id}`)
             // return;
 
         }
@@ -131,7 +131,7 @@ exports.email_signup_post = [
 
 exports.email_login_get = [
 
-    body("email")
+    body("email","Invalid email")
     .trim()
     .normalizeEmail()
     .isEmail()
@@ -140,6 +140,11 @@ exports.email_login_get = [
     .not().isEmpty(),
 
     asyncHandler(async(req,res)=>{
+        const errors = validationResult(req)
+        if (!errors.isEmpty()){
+            res.status(400).send({errors:errors.array()});
+            return;
+        }
         const {email,password} = req.body;
         // try{
             const user = await User.emailLogin(email,password);

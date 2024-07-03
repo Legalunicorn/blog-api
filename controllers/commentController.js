@@ -57,8 +57,8 @@ exports.comment_patch = [
     body("body")
         .trim()
         .isLength({max:3000})
-        .notEmpty()
-        .escape(),
+        .notEmpty(),
+        // .escape(),
 
     asyncHandler(async (req,res)=>{
         const errors = validationResult(req);

@@ -19,7 +19,7 @@ const Article = require("../models/article")
 const requireArticleAuth = async(req,res,next) =>{
     const auth = req.headers.authorization;
     if (!auth){
-        res.status(401).json({error:"Request not authroized"})
+        res.status(401).json({error:"Request not authorized"})
     }
 
     const token = auth.split(" ")[1];
@@ -28,13 +28,19 @@ const requireArticleAuth = async(req,res,next) =>{
         //the params will have the article id ?
         //
         let id;
+        let hasJWTError = false;
         jwt.verify(token,process.env.SECRET, function(err,decoded){
             if (err){
-                return res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"})
+                hasJWTError = true;
+                console.log(err);
+                res.status(401).json({error:"JWT token has expired. 301 unauthorized HTTP"});
+                return;
             }
             id = decoded.id;
         })
     
+        if (hasJWTError) return;
+
         const user = await User.findById(id).exec();
         if (user.is_admin){
             req.user = user; //set the id to req.user
@@ -55,6 +61,7 @@ const requireArticleAuth = async(req,res,next) =>{
             return
         }
         else res.status(401).json({error:"Article auth failed."})
+        return;
 
         //a
         //get the author of the aricle

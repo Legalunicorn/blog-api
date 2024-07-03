@@ -78,7 +78,7 @@ app.use(function(req, res, next) {
 
 app.use(function(err,req,res,next){
   //log the error
-  console.log(`$Errors: ${err.message}`);
+  console.log(`$Errors: ${err.message} ${err.status || '?$statys'}`);
   console.error(err.stack)
   res.header('Content-Type','application/json')
   const status = err.status || 400; //bad request
@@ -89,7 +89,7 @@ app.use(function(err,req,res,next){
     })
   }
   //not cast error
-  // res.status(status).json({error:err.message || 'Something went wrong',success:false});
+  res.status(status).json({error:err.message || 'Something went wrong',success:false});
 })
 
 

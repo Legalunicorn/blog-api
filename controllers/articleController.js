@@ -84,34 +84,37 @@ exports.artcles_post = [
 
     body("title")
         .trim()
-        .isLength({max:300})
-        .withMessage("Title must not exceed 300 characters"),
+        .isLength({min:0,max:300})
+        .withMessage("Title must be between 0 - 300 characters"),
         // .escape(), //TODO 
     body("body")
         .trim()
-        .isLength({max:50000})
-        .withMessage("Article should be less than 50,000 characters"),
+        .isLength({min:1})
+        .withMessage("Article body cannot be empty")
+        .isLength({max:80000})
+        .withMessage('Article body cannot exceed 80,000 characters'),
+    
         // .escape(),
     body("tag.*","Tags cannot exceed 100 characters long")
         .trim()
         .isLength({max:100})
         .escape(),
+    // body("tag")
+    //     .isArray({max:4}),
     body("image")
     //BUG this is dead ass chatgpt code. please review carefully 
-        .isURL().withMessage("Invalid URL"),
-        // .custom((value)=>{
-        //     if (!/\.(jpeg|jpg|png)$/.test(value)){
-        //         throw new Error("Url must be an image")
-        //     }
-        //     return true;
-        // }),
         
+        .isURL().withMessage("Invalid URL")
+        .optional({ nullable: true , checkFalsy:true}),
+
         
     asyncHandler( async(req,res)=>{
         //get all tags from DB first
         const errors = validationResult(req);
         if (!errors.isEmpty()){
-            res.status(400).json({error:errors.array()})
+            console.log(errors);
+            res.status(400).json({errors:errors.array()})
+            return;
         } else {
             const tags = await processFormTags(req.body.tag);
             const article = new Article({
@@ -137,15 +140,35 @@ exports.artcles_post = [
 // exports.get_articles_authorized_by_user
 
 //auth scop
-exports.article_written_by_users= asyncHandler(async(req,res)=>{
+
+exports.articles_written_by_user= asyncHandler(async(req,res)=>{
     //req.user in the auth will sufficer
     if (!is_valid_mongoID(req.user._id)) {
         return res.status(400).json({error:"Invalid User ID;"})
     }
 
-    const articles = await Article.find({id:req.user._id}).sort({createAt:-1}).exec();
+    //TODO fetch two posts, one for drafted and one for posted
+    const articles = await Article
+        .find({author:req.user._id})
+        .populate('tags','name')
+        .sort({createdAt:-1}).exec();
+    console.log("hi",articles);
+    console.log(req.user._id.toString())
+
+
+    //filter the articles herhe
+
+    const posted = []
+    const drafted = []
+    articles.forEach(article=>{
+        if (article.is_drafted) drafted.push(article)
+        else posted.push(article)
+    })
+    //find all articles written by user
+    // filter then in the frontend
     res.status(200).json({
-        articles
+        posted,
+        drafted
     });
 })
 
@@ -163,6 +186,8 @@ exports.articles_require_admin_get = asyncHandler(async(req,res)=>{
 
 
 
+
+
 exports.article_get = asyncHandler(async(req,res)=>{
     //check if the if is a valid mongoDB id
     console.log(req.params.article_id)
@@ -173,6 +198,8 @@ exports.article_get = asyncHandler(async(req,res)=>{
         return res.status(404).json({error:"No such article (id)"})
     }
     // load the article content
+
+    //TODO use a promose.all or somethin to make parallel calls 
     const article = await Article
         .findById(req.params.article_id)
         .populate("author","display_name")
@@ -189,6 +216,7 @@ exports.article_get = asyncHandler(async(req,res)=>{
         res.status(404).json({error: "No such article"})
     }
     else{
+        console.log('yup',article)
         res.json({article,comments});
     }
 })
@@ -222,44 +250,49 @@ exports.article_patch = [
     body("title")
         .trim()
         .isLength({max:300})
-        .withMessage("Title must not exceed 300 characters")
-        .escape(),
+        .withMessage("Title must not exceed 300 characters"),
     body("body")
         .trim()
         .isLength({max:50000})
-        .withMessage("Article should be less than 50,000 characters")
-        .escape(),
+        .withMessage("Article should be less than 50,000 characters"),
     body("tag.*","Tags cannot exceed 100 characters long")
         .trim()
         .isLength({max:100})
         .escape(),
     body("image")
         .trim()
-        .escape(),
-    param("id")
+    
+        .isURL()
+        .optional({ nullable: true }),
+    param("article_id")
         .isMongoId(),
         
-        
+    //TODO santise tags to be max length of 4;
     asyncHandler( async(req,res)=>{
-        res.json({mssg:"hi"})
+        console.log("IN PATCH!!")
+        // res.json({mssg:"hi"})
         //get all tags from DB first
         const errors = validationResult(req);
         if (!errors.isEmpty()){
+            console.log(errors);
             res.status(400).json({error:errors.array()})
             return;
         }
-        const tags = await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,
-            const article = new Article({
-                title: req.body.title,
-                body: req.body.body,
-                tags:tags,
-                image:req.body.image,
-                likes_count:0,
-                id_: req.params.article_id
-            })
-
-            await article.save();
-            res.json({article})
+        const tags =  await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,
+        const article = new Article({
+            title: req.body.title,
+            body: req.body.body,
+            author:req.user,
+            tags:tags,
+            image:req.body.image,
+            likes_count:0,
+            is_drafted: req.body.is_drafted,
+            _id: req.params.article_id
+        })
+        console.log("new article",article);
+        // await article.save();
+        await Article.findByIdAndUpdate(req.params.article_id,article);
+        res.json({article});
 
     })
 ]
