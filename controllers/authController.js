@@ -9,7 +9,7 @@ const User = require("../models/user")
 require("dotenv").config();
 
 function generateToken(id){
-    return jwt.sign({id},process.env.SECRET,{expiresIn:'1d'})
+    return jwt.sign({id},process.env.SECRET,{expiresIn:'2d'})
 }
 
 

@@ -86,13 +86,12 @@ exports.artcles_post = [
         .trim()
         .isLength({min:0,max:300})
         .withMessage("Title must be between 0 - 300 characters"),
-        // .escape(), //TODO 
     body("body")
         .trim()
         .isLength({min:1})
         .withMessage("Article body cannot be empty")
         .isLength({max:80000})
-        .withMessage('Article body cannot exceed 80,000 characters'),
+        .withMessage('Article body cannot exceed 80,000np characters'),
     
         // .escape(),
     body("tag.*","Tags cannot exceed 100 characters long")
@@ -102,7 +101,6 @@ exports.artcles_post = [
     // body("tag")
     //     .isArray({max:4}),
     body("image")
-    //BUG this is dead ass chatgpt code. please review carefully 
         
         .isURL().withMessage("Invalid URL")
         .optional({ nullable: true , checkFalsy:true}),
@@ -205,6 +203,12 @@ exports.article_get = asyncHandler(async(req,res)=>{
         .populate("author","display_name")
         .populate("tags","name")
         .exec();
+
+    // if (article.is_drafted){
+    //     res.status(404).json({error:"This article is being drafted"})
+    // }
+
+
     const comments = await Comment
         .find({article:req.params.article_id})
         .populate("author")
@@ -261,21 +265,19 @@ exports.article_patch = [
         .escape(),
     body("image")
         .trim()
-    
         .isURL()
-        .optional({ nullable: true }),
+        .optional({ nullable: true, checkFalsy:true}),
     param("article_id")
         .isMongoId(),
         
     //TODO santise tags to be max length of 4;
     asyncHandler( async(req,res)=>{
         console.log("IN PATCH!!")
-        // res.json({mssg:"hi"})
-        //get all tags from DB first
         const errors = validationResult(req);
         if (!errors.isEmpty()){
             console.log(errors);
-            res.status(400).json({error:errors.array()})
+            // throw new Error(errors.array()); //TODO do someting like this instead
+            res.status(400).json({errors:errors.array()}) //FIX shouldnt i just throw new error? 
             return;
         }
         const tags =  await processFormTags(req.body.tag); //you should make sure the Article exists first before doing this, as you will unnecessarily create new tags for an aarticle that dont exists,

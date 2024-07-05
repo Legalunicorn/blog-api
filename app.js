@@ -5,6 +5,14 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require("mongoose")
 const cors = require("cors")
+const compression = require("compression");
+const helmet = require("helmet")
+
+const RateLimit = require("express-rate-limit")
+const limiter = RateLimit({
+  windowMs: 1*60*1000,
+  max:80
+})
 
 // import the passport config
 const passportSetup = require("./config/passport-setup")
@@ -33,6 +41,12 @@ async function main(){
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+app.use(compression()) //new
+app.use(helmet());
+app.use(limiter)
+
+
 
 app.use(cors())
 app.use(logger('dev'));
