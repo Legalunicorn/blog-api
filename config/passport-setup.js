@@ -4,8 +4,8 @@ const User = require("../models/user")
 // const token = require("jsonwebtoken")
 
 const genToken = require("../utils/genereateToken")
-// require("dotenv").config(); //google client id and secret
-require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
+require("dotenv").config(); //google client id and secret
+// require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
 
 
 
