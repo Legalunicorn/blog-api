@@ -7,7 +7,6 @@ const authController = require("../controllers/authController")
 // //NOTE: the base url is "/auth"
 router.get("/google",authController.google_get)
 
-//maye like /google/redirect/:source
 router.get("/google/redirect",authController.google_redirect_get)
 
 // //TODO create login and signup functions

@@ -20,6 +20,7 @@ const passportSetup = require("./config/passport-setup")
 
 // require("dotenv").config(); // environment variables
 require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
+console.log(process.env.GOOGLE_CLIENT_ID,"wht the sigma")
 
 const authRouter = require("./routes/authRoutes")
 const articleRouter = require('./routes/articleRoutes')

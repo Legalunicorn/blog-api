@@ -5,7 +5,7 @@ const User = require("../models/user")
 
 const genToken = require("../utils/genereateToken")
 require("dotenv").config(); //google client id and secret
-// require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
+require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
 
 
 
@@ -15,6 +15,7 @@ require("dotenv").config(); //google client id and secret
 passport.use(
     new GoogleStrategy({
         callbackURL: `${process.env.API_URL}/api/auth/google/redirect`,
+        // callbackURL: `/api/auth/google/redirect`,
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET
 
