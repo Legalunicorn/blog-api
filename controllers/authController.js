@@ -60,16 +60,7 @@ exports.google_redirect_get = [
 
         
         console.log("HOST IS ",host)
-        // console.log(token)
-  
-        //redirect to VIEWER or CMS dependong on req(?)
-        //TODO change the redirect depending on which frontend client is logging in 
-        //for now we just redirect to the viewer,
 
-        // res.json({token})
-
-        //we have to find out which frontend is being logged from!
-        // res.redirect(redirect_uri);
 
         if (host=="CMS"){
             console.log('bro');
