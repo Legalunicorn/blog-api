@@ -14,6 +14,7 @@ require("dotenv").config({path:`.env.${process.env.NODE_ENV}`})
 
 passport.use(
     new GoogleStrategy({
+        // callbackURL:"penis",
         callbackURL: `${process.env.API_URL}/api/auth/google/redirect`,
         // callbackURL: `/api/auth/google/redirect`,
         clientID: process.env.GOOGLE_CLIENT_ID,

@@ -13,6 +13,10 @@ exports.like_put = asyncHandler(async(req,res,next)=>{
      * 
      * Req
      *   - user._id (provided by auth middleware )
+     * 
+     * 
+     * THERE is a big issue! if a user sends two request at once, they happen asyncrnomously
+     * meaning double clicking will perform the SAME action twice!
      */
     //first check if the article is is valid
     if (!is_valid_mongoID(req.params.article_id)){
@@ -34,13 +38,17 @@ exports.like_put = asyncHandler(async(req,res,next)=>{
             user:req.user._id,
             post:req.params.article_id
         });
-        article.likes_count+=1;
+        let count = await Like.find({post:req.params.article_id}).countDocuments();
+        console.log("COUNT IS: ",count)
+        article.likes_count= count;
         await article.save();
     }
     else{ //could not find and elete
         console.log("Has liked is")
         console.log(hasLiked);
-        article.likes_count-=1;
+        let count = await Like.find({post:req.params.article_id}).countDocuments();
+        console.log("COUNT IS: ",count)
+        article.likes_count= count;
         await article.save();
     }
     console.log("like c",article.likes_count);

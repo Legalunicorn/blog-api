@@ -65,8 +65,6 @@ exports.google_redirect_get = [
         if (host=="CMS"){
             console.log('bro');
             console.log(process.env.CMS_CLIENT_URL)
-            // res.redirect(process.env.CMS_CLIENT_URL);
-            // res.redirect('https://yahoo.com')
             res.redirect(`${process.env.CMS_CLIENT_URL}/login/?token=${token}&id=${req.user._id}`)
             // return;
 
