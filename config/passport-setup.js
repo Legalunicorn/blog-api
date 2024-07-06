@@ -14,7 +14,7 @@ require("dotenv").config(); //google client id and secret
 
 passport.use(
     new GoogleStrategy({
-        callbackURL: '/api/auth/google/redirect',
+        callbackURL: `${process.env.API_URL}/api/auth/google/redirect`,
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET
 
