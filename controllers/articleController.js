@@ -16,13 +16,21 @@ const processFormTags = require("../utils/processFormTags")
 
 exports.all_articles_get = asyncHandler(async (req,res)=>{
 
-    const top_articles = await Article.find({is_drafted:false}).sort({likes_count:-1}).populate("author").populate('tags','name').exec();
-    const all_articles = await Article.find({is_drafted:false}).sort({createdAt:-1}).populate("author").populate('tags','name').exec();
+    const [top_articles,all_articles,tags] = await Promise.all([
+        Article.find({is_drafted:false}).sort({likes_count:-1}).populate("author").populate('tags','name').exec(),
+        Article.find({is_drafted:false}).sort({createdAt:-1}).populate("author").populate('tags','name').exec(),
+        Tag.find({}).sort({name:1}).exec()
 
-    // const recent_articles = all_articles.slice(0,5); //show top 5 articles
+    ])
 
-    //TODO get all tags
-    const tags = await Tag.find({}).sort({name:1}).exec()
+
+    // const top_articles = await Article.find({is_drafted:false}).sort({likes_count:-1}).populate("author").populate('tags','name').exec();
+    // const all_articles = await Article.find({is_drafted:false}).sort({createdAt:-1}).populate("author").populate('tags','name').exec();
+
+    // // const recent_articles = all_articles.slice(0,5); //show top 5 articles
+
+    // //TODO get all tags
+    // const tags = await Tag.find({}).sort({name:1}).exec()
 
 
     res.json(
